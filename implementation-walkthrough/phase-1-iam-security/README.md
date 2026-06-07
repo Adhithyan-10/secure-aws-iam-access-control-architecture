@@ -28,7 +28,7 @@ Successfully viewed S3 buckets.
 
 ## S3 Write Access Denied
 
-![Access Denied](5-s3-create-bucket-access-denied.png)
+![Access Denied](5️-s3-create-bucket-access-denied.png)
 
 Bucket creation failed because write permissions were not granted.
 
