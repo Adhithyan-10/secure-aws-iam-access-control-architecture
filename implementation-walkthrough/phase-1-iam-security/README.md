@@ -1,4 +1,3 @@
-
 # Phase 1 - IAM Security
 
 This phase demonstrates implementation of least-privilege access using IAM users and groups.
