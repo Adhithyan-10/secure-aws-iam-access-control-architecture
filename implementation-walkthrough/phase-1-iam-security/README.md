@@ -22,18 +22,18 @@ Logged in using the restricted IAM user.
 
 ## S3 Read Access Verification
 
-![S3 Access](4-S3-Access-(Success).png)
+![S3 Access](4-S3-Access-Success.png)
 
 Successfully viewed S3 buckets.
 
 ## S3 Write Access Denied
 
-![Access Denied](5-S3-Create-Bucket-(Access-Denied).png)
+![Access Denied](5-S3-Create-Bucket-Access-Denied.png)
 
 Bucket creation failed because write permissions were not granted.
 
 ## EC2 Access Denied
 
-![EC2 Denied](6-EC2-Access-Denied.png)
+![EC2 Denied](6️-ec2-access-denied.png)
 
 EC2 access was blocked due to missing permissions.
