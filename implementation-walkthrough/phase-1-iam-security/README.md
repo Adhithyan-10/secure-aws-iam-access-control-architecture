@@ -22,7 +22,7 @@ Logged in using the restricted IAM user.
 
 ## S3 Read Access Verification
 
-![S3 Access](4-s3-access-success.png)
+![S3 Access](4️-s3-access-success.png)
 
 Successfully viewed S3 buckets.
 
