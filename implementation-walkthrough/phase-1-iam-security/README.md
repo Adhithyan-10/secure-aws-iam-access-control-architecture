@@ -16,7 +16,7 @@ Created a developers group and attached AmazonS3ReadOnlyAccess policy.
 
 ## Login as Restricted User
 
-![Dashboard](3-Developer-User-Console-Dashboard.png)
+![Dashboard](3️-developer-user-console-dashboard.png)
 
 Logged in using the restricted IAM user.
 
