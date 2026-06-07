@@ -2,7 +2,7 @@
 
 ## 🔗 Quick Access
 
-- [View Lambda Function Code](./lambda_function.py)
+- [View Lambda Function Code](./lambda-function.py)
 
 ---
 
