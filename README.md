@@ -2,222 +2,305 @@
 
 # 🔐 Secure AWS IAM Access Control Architecture
 
-### Least Privilege • IAM Roles • Temporary Credentials • IMDSv2 • Serverless Authentication
+### Designing Secure Cloud Access Using Least Privilege, IAM Roles, Temporary Credentials, and Serverless Authentication
 
-[![AWS](https://img.shields.io/badge/AWS-Cloud%20Security-orange)]()
-[![IAM](https://img.shields.io/badge/IAM-Least%20Privilege-blue)]()
-[![Lambda](https://img.shields.io/badge/Lambda-Serverless-yellow)]()
-[![DynamoDB](https://img.shields.io/badge/DynamoDB-NoSQL-purple)]()
-[![Security](https://img.shields.io/badge/Security-Production%20Focused-green)]()
-
-A hands-on AWS security project demonstrating how modern cloud environments eliminate hardcoded credentials and securely authenticate services using IAM Roles, IMDSv2, and temporary credentials.
+![AWS](https://img.shields.io/badge/AWS-Cloud%20Security-orange)
+![IAM](https://img.shields.io/badge/IAM-Access%20Control-blue)
+![Lambda](https://img.shields.io/badge/Lambda-Serverless-yellow)
+![DynamoDB](https://img.shields.io/badge/DynamoDB-NoSQL-purple)
+![Security](https://img.shields.io/badge/Security-Least%20Privilege-green)
 
 </div>
 
 ---
 
-# 🏗️ Architecture Overview
+# 🌍 Real-World Problem Statement
+
+Cloud security incidents are often caused by excessive permissions, long-lived access keys, and poor identity management practices.
+
+In many AWS environments:
+
+- Developers receive permissions beyond what they actually require.
+- Applications store AWS access keys directly in code or configuration files.
+- EC2 instances use static credentials to access AWS services.
+- Serverless workloads are granted broader permissions than necessary.
+- Access boundaries are not enforced consistently across services.
+
+These practices increase the risk of:
+
+- Unauthorized resource access
+- Credential leakage
+- Privilege escalation
+- Accidental data exposure
+- Cloud account compromise
+
+As organizations scale, securing identities and permissions becomes one of the most important challenges in cloud architecture.
+
+---
+
+# 🎯 Project Objective
+
+The goal of this project was to design and implement a secure AWS access control architecture that follows AWS security best practices.
+
+The solution focuses on:
+
+✅ Enforcing Least Privilege Access
+
+✅ Eliminating Hardcoded Credentials
+
+✅ Implementing Role-Based Access Control (RBAC)
+
+✅ Using Temporary Credentials Instead of Access Keys
+
+✅ Securing EC2 Access to AWS Services
+
+✅ Implementing Serverless Authentication
+
+✅ Applying Fine-Grained DynamoDB Permissions
+
+✅ Validating Security Controls Through Testing
+
+---
+
+# 🏗️ Solution Overview
+
+To solve these challenges, a three-phase AWS IAM architecture was implemented.
+
+### Phase 1 — Least Privilege IAM Access
+
+A dedicated IAM user was created and assigned only the permissions required to perform read-only operations on Amazon S3.
+
+Validation confirmed that:
+
+- S3 Read Operations were allowed
+- S3 Write Operations were denied
+- EC2 Access was denied
+
+This demonstrates enforcement of the Principle of Least Privilege.
+
+---
+
+### Phase 2 — Role-Based Access Control
+
+An IAM Role was attached to an EC2 instance through an Instance Profile.
+
+Instead of using long-term AWS access keys:
+
+```text
+EC2 Instance
+      │
+      ▼
+IAM Role
+      │
+      ▼
+IMDSv2
+      │
+      ▼
+Temporary Credentials
+      │
+      ▼
+Amazon S3
+```
+
+This approach:
+
+- Eliminates credential storage
+- Enables automatic credential rotation
+- Reduces attack surface
+- Improves operational security
+
+---
+
+### Phase 3 — Serverless Authentication
+
+AWS Lambda was configured with a dedicated execution role.
+
+The function accessed DynamoDB using IAM-based authentication without storing any credentials.
+
+Validation confirmed:
+
+- PutItem → Allowed
+- GetItem → Allowed
+- Scan → Allowed
+- DeleteTable → Denied
+- UpdateTable → Denied
+
+This demonstrates secure service-to-service authentication in serverless environments.
+
+---
+
+# 🏗️ Architecture Diagram
 
 <p align="center">
-  <img src="./architecture/Archyi.png" alt="Secure AWS IAM Architecture" width="100%">
+  <img src="./architecture/Archyi.png" alt="Secure AWS IAM Access Control Architecture" width="100%">
 </p>
 
 ---
 
-# 🎯 Project Goal
+# 🔄 Architecture Workflow
 
-This project demonstrates how to implement secure AWS access control using:
-
-✅ Least Privilege Access
-
-✅ IAM Users & Groups
-
-✅ IAM Roles
-
-✅ Trust Policies
-
-✅ IMDSv2
-
-✅ Temporary Credentials
-
-✅ Serverless Authentication
-
-✅ Fine-Grained DynamoDB Permissions
-
-✅ CloudWatch Monitoring
-
-The objective was to build a secure authentication flow without relying on long-term AWS access keys.
-
----
-
-# 🚀 Architecture Flow
+### Phase 1 — IAM User & Least Privilege
 
 ```text
 IAM User
-    │
-    ▼
-IAM Group + Least Privilege Policy
-    │
-    ▼
-Amazon S3 (Read Only)
-
-──────────────────────────
-
-EC2 Instance
-    │
-    ▼
-IAM Role
-    │
-    ▼
-IMDSv2
-    │
-    ▼
-Temporary Credentials
-    │
-    ▼
+      │
+      ▼
+IAM Group
+      │
+      ▼
+AmazonS3ReadOnlyAccess
+      │
+      ▼
 Amazon S3
+```
 
-──────────────────────────
+Result:
 
+✅ Read Access Allowed
+
+❌ Write Access Denied
+
+❌ EC2 Access Denied
+
+---
+
+### Phase 2 — Secure EC2 Authentication
+
+```text
+EC2 Instance
+      │
+      ▼
+IAM Role
+      │
+      ▼
+IMDSv2
+      │
+      ▼
+Temporary Credentials
+      │
+      ▼
+Amazon S3
+```
+
+Result:
+
+✅ Read Access Allowed
+
+❌ Bucket Creation Denied
+
+❌ Static Credentials Required
+
+---
+
+### Phase 3 — Serverless Authentication
+
+```text
 AWS Lambda
-    │
-    ▼
-Lambda Execution Role
-    │
-    ▼
+      │
+      ▼
+Execution Role
+      │
+      ▼
 Amazon DynamoDB
-    │
-    ▼
+      │
+      ▼
 CloudWatch Logs
 ```
+
+Result:
+
+✅ Secure DynamoDB Access
+
+✅ Automatic Authentication
+
+✅ No Credentials Stored in Code
+
+---
+
+# ☁️ AWS Services Used
+
+| Service | Purpose |
+|----------|----------|
+| AWS IAM | Identity and Access Management |
+| Amazon EC2 | Compute Instance |
+| Amazon S3 | Object Storage |
+| AWS Lambda | Serverless Compute |
+| Amazon DynamoDB | NoSQL Database |
+| Amazon CloudWatch | Monitoring and Logging |
+| IMDSv2 | Secure Metadata Access |
+| AWS CLI | Access Validation |
 
 ---
 
 # 📂 Repository Structure
 
 ```text
-Secure-AWS-IAM-Access-Control-Architecture
+secure-aws-iam-access-control-architecture
 │
-├── architecture/
-│
-├── implementation-walkthrough/
-│
-├── lambda-code/
-│
-├── policies/
-│
-├── cli-commands/
-│
-├── documentation/
-│
+├── architecture
+├── documentation
+├── implementation-walkthrough
+├── lambda-code
+├── policies
+├── cli-commands
 └── README.md
 ```
 
 ---
 
-# 📚 Explore Project Resources
+# 📚 Project Resources
 
-## 🏗️ Architecture
+### 🏗️ Architecture
 
-Understand the complete security design.
-
-➡️ [View Architecture Documentation](./architecture/README.md)
+➡️ [Architecture Documentation](./architecture/README.md)
 
 ---
 
-## 📸 Implementation Walkthrough
+### 📸 Implementation Walkthrough
 
-Complete implementation screenshots and explanations.
-
-➡️ [View Implementation Walkthrough](./implementation-walkthrough/README.md)
+➡️ [Implementation Walkthrough](./implementation-walkthrough/README.md)
 
 ---
 
-## ⚡ Lambda Function
+### ⚡ Lambda Code
 
-Serverless code used for DynamoDB integration.
-
-➡️ [View Lambda Code](./lambda-code/README.md)
+➡️ [Lambda Code](./lambda-code/README.md)
 
 ---
 
-## 🔐 IAM Policies
+### 🔐 IAM Policies
 
-All IAM policies used in the project.
-
-➡️ [View Policies](./policies/README.md)
+➡️ [Policies](./policies/README.md)
 
 ---
 
-## 💻 AWS CLI Commands
+### 💻 CLI Commands
 
-Validation and testing commands.
-
-➡️ [View CLI Commands](./cli-commands/README.md)
+➡️ [CLI Commands](./cli-commands/README.md)
 
 ---
 
-## 📄 Complete Documentation
-
-Full project report.
+### 📄 Full Documentation
 
 ➡️ [Documentation README](./documentation/README.md)
 
-➡️ [Open PDF Documentation](./documentation/Secure_AWS_IAM_Architecture.pdf)
+➡️ [Open Project PDF](./documentation/Secure_AWS_IAM_Architecture.pdf)
 
 ---
 
-# 🛡️ Security Controls Implemented
+# 🧪 Security Validation Results
 
-| Security Control | Status |
-|------------------|---------|
-| Least Privilege IAM Policies | ✅ |
-| IAM Group-Based Permissions | ✅ |
-| IAM Roles | ✅ |
-| Trust Relationships | ✅ |
-| Temporary Credentials | ✅ |
-| IMDSv2 Protection | ✅ |
-| Lambda Execution Roles | ✅ |
-| Service-to-Service Authentication | ✅ |
-| CloudWatch Monitoring | ✅ |
-| No Hardcoded Credentials | ✅ |
-
----
-
-# 🔍 Validation Results
-
-## IAM User Testing
-
-| Action | Result |
-|----------|----------|
-| List Buckets | ✅ Allowed |
-| Read Objects | ✅ Allowed |
-| Create Bucket | ❌ Denied |
-| Delete Objects | ❌ Denied |
-| EC2 Access | ❌ Denied |
-
----
-
-## EC2 IAM Role Testing
-
-| Action | Result |
-|----------|----------|
-| List Buckets | ✅ Allowed |
-| Read Objects | ✅ Allowed |
-| Create Bucket | ❌ Denied |
-| Delete Objects | ❌ Denied |
-
----
-
-## Lambda Testing
-
-| Action | Result |
-|----------|----------|
-| PutItem | ✅ Allowed |
-| GetItem | ✅ Allowed |
-| Scan | ✅ Allowed |
-| DeleteTable | ❌ Denied |
-| UpdateTable | ❌ Denied |
+| Validation | Result |
+|------------|---------|
+| Least Privilege Enforced | ✅ |
+| IAM Group Permissions Tested | ✅ |
+| IAM Role Authentication Verified | ✅ |
+| Temporary Credentials Retrieved | ✅ |
+| IMDSv2 Validation Successful | ✅ |
+| Lambda Authentication Verified | ✅ |
+| DynamoDB Access Tested | ✅ |
+| Unauthorized Actions Blocked | ✅ |
+| No Hardcoded Credentials Used | ✅ |
 
 ---
 
@@ -235,34 +318,34 @@ Full project report.
 
 ✅ IMDSv2 used for secure credential retrieval
 
-✅ Secure service-to-service authentication implemented
+✅ Service-to-service authentication implemented
 
-✅ AWS security best practices applied
+✅ AWS security best practices applied throughout the architecture
 
 ---
 
 # 🔮 Future Enhancements
 
 - MFA Enforcement
-- AWS Config Rules & Compliance
-- IAM Identity Center (SSO)
-- AWS Organizations
-- Permission Boundaries
 - CloudTrail Auditing
-- Automated Access Reviews
-- Custom Least Privilege Policies
+- IAM Identity Center (SSO)
+- Permission Boundaries
+- AWS Organizations
+- AWS Config Rules & Compliance
+- Automated IAM Access Reviews
+- Multi-Team IAM Governance
 
 ---
 
-# 🧠 Key Cloud Security Learnings
+# 🧠 Key Learnings
 
-- Never embed AWS credentials inside applications.
-- IAM Roles should replace access keys whenever possible.
-- Temporary credentials reduce attack surface.
-- IMDSv2 protects EC2 metadata access.
-- Lambda execution roles enable secure service authentication.
-- Least privilege is the foundation of cloud security.
-- Fine-grained permissions improve operational security.
+- Least Privilege is the foundation of AWS security.
+- IAM Roles are preferred over access keys.
+- Temporary credentials reduce security risk.
+- IMDSv2 protects EC2 metadata endpoints.
+- Lambda Execution Roles eliminate credential management.
+- Fine-grained permissions reduce attack surface.
+- Secure authentication should be identity-driven, not key-driven.
 
 ---
 
@@ -270,18 +353,16 @@ Full project report.
 
 ### Adhithyan Sivaraman T
 
-AWS Student Builder Group Leader
-
-Cloud & DevOps Enthusiast
-
+AWS Student Builder Group Leader  
+Cloud & DevOps Enthusiast  
 Federal Institute of Science and Technology (FISAT)
 
 ---
 
 <div align="center">
 
-### ⭐ If you found this project useful, consider starring the repository.
+### ⭐ Building Secure Cloud Architectures Through Identity-Driven Access Control
 
-**AWS • IAM • Security • Serverless • DevSecOps**
+AWS IAM • Security • Cloud Architecture • DevSecOps
 
 </div>
